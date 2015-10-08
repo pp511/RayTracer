@@ -81,28 +81,52 @@ void Setup(void)
     // CAP5705 - Set up your scene.
     // Use the variable pScene to set parameters
     // 1. change background color
-    RGBR_f backgroundcolor(1.0,1.0,1.0,1.0);
+    RGBR_f backgroundcolor(0.0,0.0,0.0,0.0);
+  //RGBR_f backgroundcolor(0.0,0.0,0.0,255.0);
     pScene->SetBackgroundColor(backgroundcolor);
 
     // 2. add lights
-    RGBR_f lightcolor(2.00, 2.00, 2.00, 2.0);
-    STVector3 position(10.0f,15.0,10.0);
-    Light light(position,lightcolor,"rayoflight");
-    pScene->AddLight(light);
+    RGBR_f lightcolor1(10.00, 0.00, 125.00, 10.0);
+      STVector3 position1(10.0f,15.0,0.0);
+      Light light1(position1,lightcolor1,"rayoflight1");
+      pScene->AddLight(light1);
 
-    Light light2(STVector3(0.0,0.0,0.0), RGBR_f(2.00, 2.00, 2.00, 2.0),"rayoflight");
-    pScene->AddLight(light2);
+  #if 0
+      // 2. add lights
+      RGBR_f lightcolor2(0.00, 10.00, 0.00, 2.0);
+      STVector3 position2(0.0,0.0,0.0);
+      Light light2(position2,lightcolor2,"rayoflight2");
+      pScene->AddLight(light2);
+
+      RGBR_f lightcolor5(0.00, 0.00, 0.00,125.0);
+      STVector3 position5(100.0f,150.0,10.0);
+      Light light5(position5,lightcolor5,"rayoflight5");
+      pScene->AddLight(light5);
+
+      RGBR_f lightcolor4(125.00, 100.00, 0.00, 200.0);
+      STVector3 position4(300.0f,300.0,300.0);
+      Light light4(position4,lightcolor4,"rayoflight4");
+      pScene->AddLight(light4);
+
+      RGBR_f lightcolor3(90.00, 80.00, 0.00, 200.0);
+      STVector3 position3(200.0f,250.0,200.0);
+      Light light3(position3,lightcolor3,"rayoflight3");
+      pScene->AddLight(light3);
+
+  #endif
+
 
     Sphere* mySphere = new Sphere();
-    mySphere->resizeSphere(2.0);
-    mySphere->moveSphere(STVector3(4.0,4.0,4.0));
+    mySphere->resizeSphere(200.0);
+    mySphere->moveSphere(STVector3(110.0,110.0,110.0));
     pScene->AddSurface(mySphere);
 
-# if 0
-    Triangle* myTriangle = new Triangle();
-    myTriangle->generateVertices(STVector3(1,1,1), STVector3(1,1,1), STVector3(1,1,1));
-    pScene->AddSurface(myTriangle);
-#endif
+ //   Triangle* myTriangle = new Triangle();
+   // myTriangle->generateVertices(STVector3(1,1,1), STVector3(1,2,1), STVector3(2,1,2));
+  //  myTriangle->generateVertices(STVector3(100,250,300), STVector3(500,250,300), STVector3(500,100,300));
+
+
+ //   pScene->AddSurface(myTriangle);
 
     // 4. add translation and rotation operations to place objects
 
