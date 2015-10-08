@@ -128,14 +128,12 @@ bool Triangle::FindIntersection (Ray ray, Intersection *pIntersection)
             float intx = ray.Origin().x+t*(raydir.x);
             float inty = ray.Origin().y+t*(raydir.y);
             float intz = ray.Origin().z+t*(raydir.z);
-       //     std::cout<< " Triangle Intersection "<<intx<<" "<< inty<<" "<<intz<<std::endl;
+            std::cout<< " Triangle Intersection "<<intx<<" "<< inty<<" "<<intz<<std::endl;
 
             pIntersection->point = STVector3(intx,inty,intz);
             pIntersection->surface = this;
             pIntersection->normal =ComputeNormalVector();
-            STVector3 raydistance = ray.Origin() - pIntersection->point ;
-            pIntersection->distanceSqu = STVector3::Dot(raydistance,raydistance);
-
+            pIntersection->distanceSqu = t*t;
             bFound = true;
         }
         return(bFound);
@@ -157,8 +155,7 @@ STVector3 Triangle::ComputeNormalVector(void)
     //---------------------------------------------------
     STVector3 edge1 = this->m_c - this->m_a;
     STVector3 edge2 = this->m_b - this->m_a;
-   // STVector3 crossp = crossproduct(edge1, edge2);
-    STVector3 crossp =STVector3::Cross(edge2, edge1);
+    STVector3 crossp = crossproduct(edge1, edge2);
    // STVector3 nl=crossp/(STVector3::Dot(crossp,crossp)) ;
     return(crossp);
 }

@@ -30,7 +30,7 @@ public:
 
     void                                SetMode                         (RenderMode mode);
 
-    RGBR_f                               Run                             (int i, Intersection *pIntersection, STVector3 *lightDirection,Scene *pScene,STVector3 lp);
+    RGBR_f                               Run                             (int i, Intersection *pIntersection, STVector3 *lightDirection,Scene *pScene,STVector3 lp, Ray ray);
 
     // TO DO: Proj2 raytracer
     // CAP5705 - Add shading functions for special effects.
@@ -45,7 +45,7 @@ private:
     RenderMode                          m_mode;
 
     RGBR_f                           Lambertian                      (int i, Intersection *pIntersection, STVector3 *lightDirection, Scene *pScene, STVector3 lp);
-    RGBR_f                           Phong                           (int i, Intersection *pIntersection, STVector3 *lightDirection, Scene *pScene, STVector3 lp);
+    RGBR_f                           Phong                           (int i, Intersection *pIntersection, STVector3 *lightDirection, Scene *pScene, STVector3 lp, Ray ray);
 
 };
 

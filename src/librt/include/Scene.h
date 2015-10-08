@@ -37,6 +37,7 @@ public:
     int                         SelectClosest                               (IntersectionList *pIntersectionList, Intersection *pIntersection);
     RGBR_f                   GetLightColor                             		(int i);
  	STVector3 				GetLightPosition(int i,Intersection *pIntersection);
+ 	int 				GetNumLightSources(void);
 
 
 private:

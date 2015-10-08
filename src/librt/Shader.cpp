@@ -26,7 +26,7 @@ void Shader::SetMode(RenderMode mode)
 
 
 // Runs the shader according to the specified render mode
-RGBR_f Shader::Run(int i, Intersection *pIntersection, STVector3 *lightDirection,Scene *pScene, STVector3 lp)
+RGBR_f Shader::Run(int i, Intersection *pIntersection, STVector3 *lightDirection,Scene *pScene, STVector3 lp,Ray ray)
 {
     RGBR_f color;
 
@@ -35,7 +35,8 @@ RGBR_f Shader::Run(int i, Intersection *pIntersection, STVector3 *lightDirection
             color = Lambertian(i,pIntersection, lightDirection,pScene,lp);
             break;
         case PHONG:
-            color = Phong(i,pIntersection, lightDirection,pScene,lp);
+
+            color = Phong(i,pIntersection, lightDirection,pScene,lp,ray);
             break;
         default:
             color = Lambertian(i, pIntersection, lightDirection,pScene,lp);
@@ -58,22 +59,28 @@ RGBR_f Shader::Lambertian(int i, Intersection *pIntersection, STVector3 *lightDi
 {
     assert(pIntersection);
     assert(lightDirection);
-    RGBR_f Int = RGBR_f(1, 1, 1, 1);
-    RGBR_f color, lightcolor;
+    RGBR_f Imax = RGBR_f(1, 1, 1, 1);
+    RGBR_f color, diffused;
+    float Kd =0.5;
     // TO DO: Proj2 raytracer
     // CAP5705 - Add shading lambertian shading.
     // 1. Lambertian shading is the dot product of the the
    //    normal and light direction
-
+#if 1
+    STVector3 normal= pIntersection->normal/pIntersection->distanceSqu;
+    float dotp= STVector3::Dot(normal,*lightDirection);
+#else
     float dotp= STVector3::Dot(pIntersection->normal,*lightDirection);
-
-     if(dotp < 0)
+#endif
+  //  std::cout<<"Dotproduce"<<dotp<<std::endl;
+    if(dotp < 0) // max(0,n.l)
+    {
     	 	dotp = 0;
-
-     lightcolor = pScene->GetLightColor(i);
-     color.r = Int.r * lightcolor.r * dotp;
-     color.g = Int.g * lightcolor.g * dotp;
-     color.b = Int.b * lightcolor.b * dotp;
+    }
+    diffused = pScene->GetLightColor(i);
+     color.r = Imax.r * diffused.r * dotp * Kd;
+     color.g = Imax.g * diffused.g * dotp * Kd;
+     color.b = Imax.b * diffused.b * dotp * Kd;
 
     // 2. Do not forget the multiply your albedo by the result
     //---------------------------------------------------------
@@ -87,7 +94,7 @@ RGBR_f Shader::Lambertian(int i, Intersection *pIntersection, STVector3 *lightDi
 
 
 // Implements diffuse shading using the lambertian lighting model
-RGBR_f Shader::Phong(int i, Intersection *pIntersection, STVector3 *lightDirection, Scene *pScene, STVector3 lp)
+RGBR_f Shader::Phong(int i, Intersection *pIntersection, STVector3 *lightDirection, Scene *pScene, STVector3 lp, Ray ray)
 {
 
     assert(pIntersection);
@@ -95,43 +102,41 @@ RGBR_f Shader::Phong(int i, Intersection *pIntersection, STVector3 *lightDirecti
 
     RGBR_f color;
 
+    RGBR_f Imax = RGBR_f(1, 1, 1, 1);
 
+    RGBR_f Ia = RGBR_f(0.7, 0.7, 0.7, 0.7);
+    RGBR_f Ka = RGBR_f(0.5,0.5,0.5,0.5);
+    RGBR_f ambient = RGBR_f(Ia.r*Ka.r, Ia.g*Ka.g, Ia.b*Ka.b, 1);
 
-    //RGBR_f RayTracer::PhongShader(STVector3 &n, STVector3 &lPosition, RGBR_f sphereColor, int p) {
-        RGBR_f ambIntensity = (RGBR_f(0.8, 0.8, 0.8, 1));
-        RGBR_f intesity = RGBR_f(1, 1, 1, 1);
-        RGBR_f ambient = RGBR_f(ambIntensity.r * 0.5, ambIntensity.g * 0.5, ambIntensity.b * 0.5, 1);
-        RGBR_f lightcolor, specTerm, diffTerm;
+    RGBR_f diffused = Lambertian(i,pIntersection, lightDirection,pScene,lp);
 
-        lightcolor = pScene->GetLightColor(i);
+    RGBR_f Ks = RGBR_f(0.9,0.9,0.9,0.9);
+    STVector3 eye = STVector3(200.0,200.0,200.0) ;
+    STVector3 eyeray = eye - pIntersection->point;
+   // STVector3 eyeray = ray.origin - pIntersection->point;
+    STVector3 l = *lightDirection/(sqrtf(STVector3::Dot(*lightDirection,*lightDirection)));
+    STVector3 v = eyeray/(STVector3::Dot(eyeray,eyeray));
+    STVector3 h = (v + l)/sqrtf(STVector3::Dot(v + l, v + l));
 
-        float dotproduct = STVector3::Dot(pIntersection->normal,*lightDirection);
-        float max = (dotproduct > 0 ? dotproduct : 0);
-        diffTerm.r = intesity.r * lightcolor.r*max;
-        diffTerm.g = intesity.g * lightcolor.g*max;
-        diffTerm.b = intesity.b * lightcolor.b*max;
+    int exp = 10;
+    float multiplier;
+    float cosalpha = STVector3::Dot(pIntersection->normal,h);
+    if(cosalpha < 0) // max(0,n.l)
+    		multiplier = 0;
+    else
+    		multiplier = pow(cosalpha,exp);
 
-        STVector3 lookAt = STVector3(0.0, 0.0, -1);
-        lookAt.Normalize();
+    RGBR_f specular;
+    specular.r = Imax.r * Ks.r * multiplier;
+    specular.g = Imax.g * Ks.g * multiplier;
+    specular.b = Imax.b * Ks.b * multiplier;
 
-        STVector3 h = lp - lookAt;
-     //   int power = p;
-        int power = 2;
-        h.Normalize();
-        float dp2 = STVector3::Dot(pIntersection->normal, h);
+    RGBR_f phongcolor;
+    color.r = ambient.r + diffused.r + specular.r;
+    color.g = ambient.g + diffused.g + specular.g;
+    color.b = ambient.b + diffused.b + specular.b;
 
-        RGBR_f ks = RGBR_f(1, 1, 1, 1);
-        float dp3 = pow((dp2 > 0 ? dp2 : 0), power);
-        specTerm.r = intesity.r * ks.r*dp3;
-        specTerm.g = intesity.g * ks.g*dp3;
-        specTerm.b = intesity.b * ks.b*dp3;
-
-        RGBR_f result;
-        result.r = ambient.r + diffTerm.r + specTerm.r;
-        result.g = ambient.g + diffTerm.g + specTerm.g;
-        result.b = ambient.b + diffTerm.b + specTerm.b;
-
-        return result;
+        return color;
 
     // TO DO: Proj2 raytracer
     // CAP5705 - Add Phong shading.

@@ -87,10 +87,12 @@ bool Sphere::FindIntersection(Ray ray, Intersection *pIntersection)
 		}
 
 		// 2. Store the results of the intersection
-		pIntersection->distanceSqu = sqrtf(a)*t;
+		STVector3 raydistance = ray.Origin() - pIntersection->point ;
+		pIntersection->distanceSqu = STVector3::Dot(raydistance, raydistance);
+
 		pIntersection->point = ray.Origin() + t*ray.Direction();
 
-		std::cout << "Sphere Intersection " <<pIntersection->point.x <<pIntersection->point.y<<pIntersection->point.z << std::endl;
+	//	std::cout << "\n Sphere Intersection " <<pIntersection->point.x <<pIntersection->point.y<<pIntersection->point.z << std::endl;
 
 		pIntersection->normal = (pIntersection->point - m_center) / r;
 		pIntersection->surface = this;

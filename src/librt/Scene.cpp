@@ -93,6 +93,15 @@ STVector3 Scene::GetLightPosition(int i,Intersection *pIntersection )
     return(lightPosition);
 }
 
+//Returns the nuber of Light Sources
+int Scene::GetNumLightSources(void)
+{
+	int numlightsource;
+	numlightsource=m_lights.size();
+	std::cout<<"Num Light Sources"<<numlightsource<<std::endl;
+	return numlightsource;
+}
+
 // Select the closest intersection and return the number of points
 // very close to this one
 int Scene::SelectClosest(IntersectionList *pIntersectionList, Intersection *pIntersection)
