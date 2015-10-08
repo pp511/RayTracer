@@ -62,7 +62,6 @@ bool Sphere::FindIntersection(Ray ray, Intersection *pIntersection)
     float c = xo*xo-2*xo*xc+xc*xc + yo*yo-2	*yo*yc+yc*yc + zo*zo-2*zo*zc+zc*zc - r*r;
 
     float discriminant = b*b - (4.0f)*a*c;
-    std::cout<<"Discriminant"<<discriminant<<std::endl;
 
     if(discriminant < 0)
     	bFound = false;
@@ -72,21 +71,31 @@ bool Sphere::FindIntersection(Ray ray, Intersection *pIntersection)
 		float t1 = (-0.5f)*(b+D)/a;
 		float t2 = (-0.5f)*(b-D)/a;
 		/* Chosing the closest intersection point*/
-		if(t1 < t2)
-			t = t1;
-		else t = t2;
+
+		if (D < 0.0f)
+		return false;
+
+		if (t1 > 0.000001f)
+		{
+			t = (float)t1;
+			bFound = true;
+		}
+		if ((t2 > 0.000001f) && (t2 < t1))
+		{
+			t = (float)t2;
+			bFound = true;
+		}
+
 		// 2. Store the results of the intersection
-		if(t > 0.0f)
-				{
-				pIntersection->distanceSqu = sqrtf(a)*t;
-				pIntersection->point = ray.Origin() + t*ray.Direction();
-				pIntersection->normal = (pIntersection->point - m_center) / r;
-				pIntersection->surface = this;
-				bFound = true;
-				}
-		else
-				bFound = false;
-    }
+		pIntersection->distanceSqu = sqrtf(a)*t;
+		pIntersection->point = ray.Origin() + t*ray.Direction();
+
+		std::cout << "Sphere Intersection " <<pIntersection->point.x <<pIntersection->point.y<<pIntersection->point.z << std::endl;
+
+		pIntersection->normal = (pIntersection->point - m_center) / r;
+		pIntersection->surface = this;
+		bFound = true;
+}
 	// 3. if found and return true, otherwise, return false
     return(bFound);
     // NOTE: The IntersectionPoint pIntersection should store:

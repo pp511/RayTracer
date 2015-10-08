@@ -54,6 +54,15 @@ bool Triangle::IntersectionSolver(Ray ray, STVector3 A, STVector3 B, STVector3 C
     return(bFoundSolution);
 }
 
+STVector3 Triangle::crossproduct(STVector3 u, const STVector3 v)
+{
+   return STVector3(u.y*v.z - u.z*v.y , u.z*v.x - u.x*v.z , u.x*v.y- u.y*v.x);
+}
+
+float Triangle::dotproduct(STVector3 u, const STVector3 v)
+{
+   return (u.x*v.x+u.y*v.y+u.z*v.z);
+}
 
 
 //----------------------------------------------------------------------------
@@ -69,7 +78,7 @@ bool Triangle::FindIntersection (Ray ray, Intersection *pIntersection)
     // CAP5705 - Find Intersections.
     // 1. Find intersections with this object along the Ray ray
     //    Use barycentric coordinates and linear equations
-    // 2. Store the results of the intersection 
+    // 2. Store the results of the intersection
     // 3. If found return true, otherwise, return false
     // NOTE: The Intersection pIntersection should store:
     // hit point, surface normal, the time t of the ray at the hit point
@@ -77,8 +86,57 @@ bool Triangle::FindIntersection (Ray ray, Intersection *pIntersection)
     //------------------------------------------------
 
     //------------------------------------------------------
+    	STVector3 edge1,edge2;
+    	edge1.x = m_b.x - m_a.x;
+    	edge1.y = m_b.y - m_a.y;
+    	edge1.z = m_b.z - m_a.z;
+    	edge2.x = m_c.x - m_a.x;
+    	edge2.y = m_c.y - m_a.y;
+    	edge2.z = m_c.z - m_a.z;
 
-    return(bFound);
+        STVector3 raydir = ray.Direction();
+
+        STVector3 h = crossproduct(raydir,edge2);
+
+        float a = dotproduct(edge1,h);
+
+        if (a > -0.00001 && a < 0.00001)
+        {
+        	 return(false);
+        }
+
+
+        float f =1 / a;
+
+        STVector3 Rorg = ray.Origin();
+        STVector3 s = ray.Origin() - m_a;
+
+        float u = f * (dotproduct(s,h));
+
+        if( u< 0 || u >1.0)
+            return false;
+        STVector3 q = crossproduct(s,edge1);
+
+        float v = f *(dotproduct(raydir,q));
+
+        if(v <0.0 || u+v > 1.0)
+            return false;
+
+        float t = f * (dotproduct(edge2,q));
+
+        if(t> 0.00001){
+            float intx = ray.Origin().x+t*(raydir.x);
+            float inty = ray.Origin().y+t*(raydir.y);
+            float intz = ray.Origin().z+t*(raydir.z);
+            std::cout<< " Triangle Intersection "<<intx<<" "<< inty<<" "<<intz<<std::endl;
+
+            pIntersection->point = STVector3(intx,inty,intz);
+            pIntersection->surface = this;
+            pIntersection->normal =ComputeNormalVector();
+            pIntersection->distanceSqu = t*t;
+            bFound = true;
+        }
+        return(bFound);
 }
 
 //-------------------------------------------------
@@ -95,8 +153,10 @@ STVector3 Triangle::ComputeNormalVector(void)
     //------------------------------------------------
 
     //---------------------------------------------------
+    STVector3 edge1 = this->m_c - this->m_a;
+    STVector3 edge2 = this->m_b - this->m_a;
 
-    return(normal);
+    return(crossproduct(edge1,edge2));
 }
 
 

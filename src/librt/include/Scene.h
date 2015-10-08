@@ -30,11 +30,13 @@ public:
 
 
     Camera                      *GetCamera                                  (void);
-    STVector3                    GetLightDirection                          (void);
+    STVector3                    GetLightDirection                          (int i,Intersection *pIntersection);
 
     int                         FindIntersection                            (Ray ray, Intersection *pIntersection, bool bAny);
     int                         FindClosestIntersection                     (Ray ray, Intersection *pIntersection);
     int                         SelectClosest                               (IntersectionList *pIntersectionList, Intersection *pIntersection);
+    RGBR_f                   GetLightColor                             		(int i);
+ 	STVector3 				GetLightPosition(int i,Intersection *pIntersection);
 
 
 private:
@@ -56,7 +58,6 @@ private:
 
     // clear scene
     void                        Clear               (void);
-
 
 };
 

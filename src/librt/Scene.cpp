@@ -62,9 +62,10 @@ Camera *Scene::GetCamera(void)
 
 // computes the direction of the light in the scene
 // and returns it
-STVector3 Scene::GetLightDirection(void)
+STVector3 Scene::GetLightDirection(int i,Intersection *pIntersection )
 {
     STVector3 lightDirection;
+    lightDirection = m_lights.at(i).GetPosition() - pIntersection->point;
 
     // TO DO: Proj2 raytracer
     // CAP5705 - Compute light direction.
@@ -76,17 +77,44 @@ STVector3 Scene::GetLightDirection(void)
 }
 
 
+// computes the position of the light in the scene
+// and returns it
+STVector3 Scene::GetLightPosition(int i,Intersection *pIntersection )
+{
+    STVector3 lightPosition;
+    lightPosition = m_lights.at(i).GetPosition();
+
+    // TO DO: Proj2 raytracer
+    // CAP5705 - Compute light direction.
+    // 1. Return the direction of the light in the scene
+    //---------------------------------------------------------
+    //---------------------------------------------------------
+
+    return(lightPosition);
+}
+
 // Select the closest intersection and return the number of points
 // very close to this one
-int Scene::SelectClosest(IntersectionList *pIntersectionList, Intersection *pIntersection) 
+int Scene::SelectClosest(IntersectionList *pIntersectionList, Intersection *pIntersection)
 {
 
     int numPoints = 0;
+    int min=999999;
+    for (int i=0;i < pIntersectionList->size() ; i++)
+    {
+    	if((pIntersectionList->at(i)).distanceSqu < min)
+    	{
+    		min = (pIntersectionList->at(i)).distanceSqu;
+    		*pIntersection = pIntersectionList->at(i);
+    		numPoints++;
 
+    	}
+    }
     // TO DO: Proj2 raytracer
     // CAP5705 - Find the closest intersection.
     // 1. Find the closest (over all objects) intersection and update pIntersection
     // 2. return the number of really close points if there is a cluster
+
     //---------------------------------------------------------
 
     //---------------------------------------------------------
@@ -126,28 +154,29 @@ int Scene::FindIntersection(Ray ray, Intersection *pIntersection, bool bAny)
     SurfaceList::const_iterator iter = m_surfaceList.begin();
     SurfaceList::const_iterator end  = m_surfaceList.end();
 
-    for (; iter != end; ++iter) {
+    for (int i=0; iter != end; ++iter) {
 
         // TO DO: Proj2 raytracer
         // CAP5705 - Find Intersections.
         // 1. Find intersections with objects in the scene
 
-    //	m_surfaceList(*iter)->FindIntersection(ray,&intersectionList(*iter));
+    	//	m_surfaceList(*iter)->FindIntersection(ray,&intersectionList(*iter));
     	// 2. If bAny is true, return as soon as you find one
         //    Do not forget to update the pIntersection before returning
         // 3. Othersize just add to the list of intersections
         //------
-    	if(m_surfaceList.at(0)->FindIntersection(ray,pIntersection))
+    	if(m_surfaceList.at(i)->FindIntersection(ray,pIntersection))
     	{
     		if(bAny == true)
     			return true;
     		else
-    			;
-    			//intersectionList.push_back(pIntersection);
+    			intersectionList.push_back(*pIntersection);
     			//Add o the list of Intersections;
     	}
+    	i++;
 
     }
+    numPoints = SelectClosest(&intersectionList,pIntersection);
 
     // TO DO: Proj2 raytracer
     // CAP5705 - Find Intersections.
@@ -176,3 +205,10 @@ void Scene::Clear(void)
     // clean up
     m_surfaceList.clear();
 }
+
+RGBR_f Scene:: GetLightColor(int i)
+{
+	return(m_lights.at(i).GetColor());
+
+}
+

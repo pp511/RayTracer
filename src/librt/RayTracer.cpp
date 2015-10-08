@@ -50,35 +50,51 @@ void RayTracer::Run(Scene *pScene, std::string fName, RenderMode mode)
 
     int width = 320;
     int height = 400;
-  //   int width = 1800;
-  //   int height = 1000;
+    //int width = 1800;
+    //int height = 1000;
     RGBR_f bkground = pScene->GetBackgroundColor();
     STImage *pImg = new STImage(width, height, STImage::Pixel(bkground.r*255, bkground.g*255, bkground.b*255, bkground.a*255));
 
     // TO DO: Proj2 raytracer
     // CAP5705 - Implement the ray tracing algorithm.
-    // 1. Cast a ray from the camera into the scene
+    // 1. Cast a ray from the camera into the scene.
     int i,j,k;
-    // 3. Compute shading for the closest intersections
- //   for(int i=3; i < 5; i++)
-  //      	for(j=3; j < 5; j++)
+
+    Shader* myshader = new Shader();
+	Intersection *pIntersection = new Intersection;
+	Ray* myray = new Ray();
+
+
     for(int i=0; i < height; i++)
     	for(j=0; j < width; j++)
     	{
-    		 Ray* myray = new Ray();
     		 myray->SetOrigin(STVector3(i,j,0));
     		 myray->SetDirection(STVector3(0,0,1));
-    		 Intersection *pIntersection = new Intersection;
 
-    		 if(pScene->FindIntersection(*myray,pIntersection,false))
+    		 if(pScene->FindClosestIntersection(*myray,pIntersection))
     		 {
     			 //Calculate Shading
-    			 pImg->SetPixel(pIntersection->point.x,pIntersection->point.y,STColor4ub(0.0,0.0,0.0,0.0));
-
+#if 1
+    			 	for(int k = 0 ; i < 1 ; i++ )
+    			 	{
+						STVector3 lr = pScene->GetLightDirection(k,pIntersection);
+						STVector3 lp = pScene->GetLightPosition(k,pIntersection);
+						RGBR_f intcolor = myshader->Run(k,pIntersection,&lr,pScene, lp);
+						pImg->SetPixel(j,i,STColor4ub(intcolor.r*255,intcolor.g*255,\
+						    			    	intcolor.b*255,bkground.a*255));
+    			 	}
+#else
+    			 	STVector3 lr = pScene->GetLightDirection(0,pIntersection);
+					STVector3 lp = pScene->GetLightPosition(0,pIntersection);
+					RGBR_f intcolor = myshader->Run(0,pIntersection,&lr,pScene, lp);
+					pImg->SetPixel(j,i,STColor4ub(intcolor.r*255,intcolor.g*255,\
+											intcolor.b*255,bkground.a*255));
+#endif
     		 }
     		 else
-    		// pImg->SetPixel(pIntersection->point.x,pIntersection->point.y,STColor4ub(0.0,0.0,0.0,0.0));
-    		 std::cout << "Intersection Point" <<pIntersection->point.x <<pIntersection->point.y<<pIntersection->point.z << std::endl;
+    			 pImg->SetPixel(j,i,STColor4ub(bkground.r*255, bkground.g*255, bkground.b*255, bkground.a*255));
+
+
     	}
     //       - no interection means shade to the background color
     //       - one intersection - great compute shading
