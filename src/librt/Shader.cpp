@@ -29,17 +29,12 @@ void Shader::SetMode(RenderMode mode)
 RGBR_f Shader::Run(int i, Intersection *pIntersection, STVector3 *lightDirection,Scene *pScene, STVector3 lp,Ray ray)
 {
     RGBR_f color;
-  //	 m_mode = PHONG;
-
-    RGBR_f matcolor = pIntersection->getMatColor();
-
     switch (m_mode) {
         case LAMBERTIAN:
             color = Lambertian(i,pIntersection, lightDirection,pScene,lp);
             break;
         case PHONG:
             color = Phong(i,pIntersection, lightDirection,pScene,lp,ray);
-       //     color = RGBR_f(color.r * matcolor.r, color.g * matcolor.g, color.b * matcolor.b, color.a * matcolor.a);
             break;
         default:
             color = Lambertian(i, pIntersection, lightDirection,pScene,lp);
@@ -52,9 +47,8 @@ RGBR_f Shader::Run(int i, Intersection *pIntersection, STVector3 *lightDirection
     // 2. Update the RenderMode structure in def.h to flag these
     //---------------------------------------------------------
     //---------------------------------------------------------
- //   color = RGBR_f(color.r *255, color.g, color.b,color.a);
-   color = RGBR_f(color.r * matcolor.r, color.g * matcolor.g, color.b * matcolor.b, color.a * matcolor.a);
-  //  std::cout<< " <<r g b f material"<<matcolor.r<<" "<<matcolor.g<<" "<<matcolor.b<<std::endl;
+    RGBR_f matcolor = pIntersection->getMatColor();
+    color = RGBR_f(color.r * matcolor.r, color.g * matcolor.g, color.b * matcolor.b, color.a * matcolor.a);
 
     return(color);
 }
@@ -67,39 +61,26 @@ RGBR_f Shader::Lambertian(int i, Intersection *pIntersection, STVector3 *lightDi
     assert(lightDirection);
     RGBR_f Imax = RGBR_f(1, 1, 1, 1);
     RGBR_f color, diffused;
-    float Kd =0.9;
+    float Kd =0.8;
     // TO DO: Proj2 raytracer
     // CAP5705 - Add shading lambertian shading.
     // 1. Lambertian shading is the dot product of the the
    //    normal and light direction
-#if 1
-    STVector3 normal= pIntersection->normal/pIntersection->distanceSqu;
- //   STVector3 normal= pIntersection->normal;
-       float dotp= STVector3::Dot(normal,*lightDirection);
- //   float dotp= STVector3::Dot(normal,*lightDirection/STVector3::Dot(*lightDirection,*lightDirection));
-#else
-  // float dotp= STVector3::Dot(pIntersection->normal,*lightDirection);
-  float dotp= STVector3::Dot(pIntersection->normal/STVector3::Dot(pIntersection->normal,pIntersection->normal),*lightDirection);
 
-#endif
-  //  std::cout<<"Dotproduce"<<dotp<<std::endl;
+
+       float dotp= STVector3::Dot(pIntersection->normal/STVector3::Dot(pIntersection->normal,pIntersection->normal),*lightDirection/STVector3::Dot(*lightDirection,*lightDirection));
+
     if(dotp < 0) // max(0,n.l)
     {
-    	 //std::cout<<"Dotproduct"<<dotp<<std::endl;
     	 	dotp = 0;
     }
-    else{
-    	std::cout<<"Dotproduct"<<dotp<<std::endl;
-    }
-     color = pScene->GetLightColor(i);
-  /*
-     diffused.r = Imax.r * color.r * dotp * Kd ;
-     diffused.g = Imax.g * color.g * dotp * Kd ;
-     diffused.b = Imax.b * color.b * dotp * Kd ;
-*/
-     	diffused.r = Imax.r * dotp *  Kd ;
-        diffused.g = Imax.g *  dotp * Kd ;
-        diffused.b = Imax.b *  dotp * Kd ;
+
+    color = pScene->GetLightColor(i);
+
+	diffused.r = Imax.r * dotp *  Kd ;
+	diffused.g = Imax.g *  dotp * Kd ;
+	diffused.b = Imax.b *  dotp * Kd ;
+	//Multiplies by the surface color in Run function.
     // 2. Do not forget the multiply your albedo by the result
     //---------------------------------------------------------
 
@@ -122,22 +103,23 @@ RGBR_f Shader::Phong(int i, Intersection *pIntersection, STVector3 *lightDirecti
    // std::cout<<"****Phong*****"<<std::endl;
     RGBR_f Imax = RGBR_f(1, 1, 1, 1);
 
-    RGBR_f Ia = RGBR_f(1, 1,1,1);
-    RGBR_f Ka = RGBR_f(0.5,0.5,0.5,0.5);
+    RGBR_f Ia = RGBR_f(.4,.4,.4,.4);
+    RGBR_f Ka = RGBR_f(0.2,0.2,0.2,0.2);
     RGBR_f ambient = RGBR_f(Ia.r*Ka.r, Ia.g*Ka.g, Ia.b*Ka.b, 1);
 
     RGBR_f diffused = Lambertian(i,pIntersection, lightDirection,pScene,lp);
 
-    RGBR_f Ks = RGBR_f(0.5,0.5,0.5,0.5);
-   // STVector3 eye = STVector3(200.0,200.0,200.0) ;
+    RGBR_f Ks = RGBR_f(0.9,0.9,0.9,0.9);
+//  STVector3 eye = STVector3(200.0,200.0,0) ;
+//  STVector3 eyeray = ray.origin - pIntersection->point;
+
     STVector3 eye = STVector3(0,0,0) ;
     STVector3 eyeray = eye - pIntersection->point;
-   // STVector3 eyeray = ray.origin - pIntersection->point;
+
     STVector3 l = *lightDirection/(sqrtf(STVector3::Dot(*lightDirection,*lightDirection)));
+    STVector3 normal= pIntersection->normal/pIntersection->distanceSqu;
     STVector3 v = eyeray/(STVector3::Dot(eyeray,eyeray));
     STVector3 h = (v + l)/sqrtf(STVector3::Dot(v + l, v + l));
-    STVector3 normal= pIntersection->normal/pIntersection->distanceSqu;
-  //  STVector3 normal= pIntersection->normal/(STVector3::Dot(pIntersection->normal,pIntersection->normal));
 
     int exp = 2;
     float multiplier;

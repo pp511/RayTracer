@@ -24,13 +24,11 @@ using namespace std;
 #include "Triangle.h"
 #include "defs.h"
 
-
 // globals
 //---------------------------------
 // scene
 Scene       *pScene = NULL;     // scene geometry and lights
 RayTracer   *pRayTracer = NULL; // runs ray tracing algorithm
-RenderMode   mode = LAMBERTIAN;
 
 // mouse
 int gPreviousMouseX = -1;
@@ -71,116 +69,79 @@ void EnvironmentMapping(void);
 //---------------------------------------------------------------------
 // Creates the scene
 //
-void Setup(void)
+void Setup(RenderMode mode)
 {
 
     // init the scene
     pScene = new Scene();
 
-    // TO DO: Proj2 raytracer
-    // CAP5705 - Set up your scene.
-    // Use the variable pScene to set parameters
     // 1. change background color
-   // RGBR_f backgroundcolor(0,0,0,1);
-    RGBR_f backgroundcolor(0,1,0,1);
+
+    RGBR_f backgroundcolor(0,0,0,1);
     pScene->SetBackgroundColor(backgroundcolor);
 
     // 2. add lights
- /*
-    RGBR_f lightcolor1(255.00,255.00,0.00, 255.0);
-      STVector3 position1(10.0f,15.0,25.0);
-      Light light1(position1,lightcolor1,"rayoflight1");
-      pScene->AddLight(light1);
- */
-#if 1
-    RGBR_f lightcolor1(1.0,1.0,1.0,1.0);
- //RGBR_f lightcolor1(255,0,0,255);
-    STVector3 position1(200,200,0);
-//    STVector3 position1(200,50,100);
+    // 3. add objects to scene
+    // 4. add translation and rotation operations to place objects
+if(mode == LAMBERTIAN)
+{
+    RGBR_f lightcolor1(1.0,.0,1.0,1.0);
+    STVector3 position1(200,100,-200);
     Light light1(position1,lightcolor1,"rayoflight1");
     pScene->AddLight(light1);
-#endif
 
-/*
-      RGBR_f lightcolor2(100.00, 0.00, 0.00, 255.0);
-      STVector3 position2(0.0,0.0,0.0);
-      Light light2(position2,lightcolor2,"rayoflight2");
-      pScene->AddLight(light2);
-*/
-#if 0
-      RGBR_f lightcolor5(1.00, 1.00, 1.00,1.0);
-      STVector3 position5(200.0,150.0,0.0);
-      Light light5(position5,lightcolor5,"rayoflight5");
-      pScene->AddLight(light5);
-
-      RGBR_f lightcolor4(1.00, 1.00, 1.00, 1.0);
-      STVector3 position4(0.0,0.0,0.0);
-      Light light4(position4,lightcolor4,"rayoflight4");
-      pScene->AddLight(light4);
-
-      RGBR_f lightcolor3(1.00, 1.00, 1.00, 1.0);
-      STVector3 position3(200.0,0.0,300.0);
-      Light light3(position3,lightcolor3,"rayoflight3");
-      pScene->AddLight(light3);
-
-  #endif
-
-
-#if 1 // Final For Lambertian
     Sphere* mySphere1 = new Sphere();
     mySphere1->resizeSphere(100.0);
-    mySphere1->moveSphere(STVector3(200.0,150.0,600));
+    mySphere1->moveSphere(STVector3(200.0,150.0,150));
     mySphere1->applymatColor(RGBR_f(255.0,0.0,0.0,1));
     pScene->AddSurface(mySphere1);
-#endif
-#if 0
+}
+
+else if(mode == PHONG)
+{
+    RGBR_f lightcolor1(1.0,1.0,1.0,1.0);
+    STVector3 position1(0,0,0);
+    Light light1(position1,lightcolor1,"rayoflight1");
+    pScene->AddLight(light1);
+
+    RGBR_f lightcolor5(1.00, 1.00, 1.00,1.0);
+    STVector3 position5(100.0,150.0,-300.0);
+    Light light5(position5,lightcolor5,"rayoflight2");
+    pScene->AddLight(light5);
+
+    RGBR_f lightcolor4(1.00, 1.00, 1.00, 1.0);
+    STVector3 position4(0.0,200.0,300.0);
+    Light light4(position4,lightcolor4,"rayoflight3");
+    pScene->AddLight(light4);
+
+    RGBR_f lightcolor3(1.00, 1.00, 1.00, 1.0);
+    STVector3 position3(200.0,0.0,300.0);
+    Light light3(position3,lightcolor3,"rayoflight4");
+    pScene->AddLight(light3);
+
+    Sphere* mySphere1 = new Sphere();
+    mySphere1->resizeSphere(100.0);
+    mySphere1->moveSphere(STVector3(200.0,150.0,200));
+    mySphere1->applymatColor(RGBR_f(255.0,0.0,0.0,1));
+    pScene->AddSurface(mySphere1);
+
     Sphere* mySphere2 = new Sphere();
-        mySphere2->resizeSphere(100.0);
-        mySphere2->moveSphere(STVector3(250.0,250.0,250.0));
-        mySphere2->applymatColor(RGBR_f(0,255,0,1));
-        pScene->AddSurface(mySphere2);
+   	mySphere2->resizeSphere(100.0);
+   	mySphere2->moveSphere(STVector3(500.0,250.0,150.0));
+   	mySphere2->applymatColor(RGBR_f(0,255,0,1));
+   	pScene->AddSurface(mySphere2);
 
-
-/*
-        Sphere* mySphere3 = new Sphere();
-            mySphere3->resizeSphere(100.0);
-            mySphere3->moveSphere(STVector3(300.0,300.0,200.0));
-            mySphere3->applymatColor(RGBR_f(0,0,255,1));
-            pScene->AddSurface(mySphere3);
-
-*/
-
-            Sphere* mySphere4 = new Sphere();
-                mySphere4->resizeSphere(100.0);
-                mySphere4->moveSphere(STVector3(150.0,150.0,300.0));
-                mySphere4->applymatColor(RGBR_f(255,255,0,1));
-                pScene->AddSurface(mySphere4);
-
-
-/*
-    Sphere* mySphere[10];
- for(int i =0; i < 2; i++)
- {
-	 mySphere[i] = new Sphere;
-	 mySphere[i]->resizeSphere(100.0);
-	 mySphere[i]->moveSphere(STVector3(i*100,i*100,i*100));
-	 pScene->AddSurface(mySphere[i]);
-
- }
-
-*/
-
-#else
+	Sphere* mySphere4 = new Sphere();
+	mySphere4->resizeSphere(100.0);
+	mySphere4->moveSphere(STVector3(100.0,100.0,200.0));
+	mySphere4->applymatColor(RGBR_f(255,255,0,1));
+	pScene->AddSurface(mySphere4);
 
     Triangle* myTriangle = new Triangle();
-    myTriangle->generateVertices(STVector3(100,150,500), STVector3(300,300,500), STVector3(150,300,500));
-   // myTriangle->generateVertices(STVector3(100,100,150), STVector3(200,300,250), STVector3(250,300,250));
-    myTriangle->applymatColor(RGBR_f(125,255,125,255));
- // myTriangle->generateVertices(STVector3(50,50,100), STVector3(250,50,100), STVector3(150,100,100));
+    myTriangle->generateVertices(STVector3(500,50,100), STVector3(50,100,300), STVector3(250,350,500));
+    myTriangle->applymatColor(RGBR_f(0,0,255,255));
     pScene->AddSurface(myTriangle);
-#endif
-    // 4. add translation and rotation operations to place objects
-
+}
     // init a ray tracer object
     pRayTracer = new RayTracer();
 
@@ -330,37 +291,44 @@ void MouseMotionCallback(int x, int y)
 //-----------------------------------------------
 int main(int argc, char** argv)
 {
-
-    // TO DO: Proj2 raytracer
-    // CAP5705 - Set the render mode.
-    // 1. Add a commandline parameter for the render mode
-    // 2. Remove the global variable
-    //------------------------------------------------
-    //    mode = LAMBERTIAN;
-    //------------------------------------------------
-
-     mode = PHONG;
-
-    // Initializes the scene
-#if 0
-    Switch(argv[0]{
-
-        case LAMBERTIAN:
+	char* shadingmode = argv[1];
+	RenderMode   mode;
+    switch(shadingmode[0])
+     {
+        case '0':
         	mode = LAMBERTIAN;
-        case PHONG:
+        	std::cout<<"LAMBERTIAN"<<std::endl;
+        	break;
+        case '1':
         	mode = PHONG;
-        case MIRROR:
-        	mode = MIRROR;
-        case ENVIRONMENTMAP:
+        	std::cout<<"PHONG"<<std::endl;
+        	break;
+        case '2':
+        	mode = PHONG;
+        	std::cout<<"Mode Not Implemented Applying Phong"<<std::endl;
+        	break;
+        case '3':
         	mode = ENVIRONMENTMAP;
-        case EFFECT_1:
-        	mode = EFFECT_1;
-        case EFFECT_2:
-        	mode = EFFECT_2;
-        case EFFECT_3:
-        	mode = EFFECT_3;
-#endif
-    Setup();
+            std::cout<<"Mode Not Implemented Applying Phong"<<std::endl;
+        	break;
+        case '4':
+        	mode = PHONG;
+            std::cout<<"Mode Not Implemented Applying Phong"<<std::endl;
+        	break;
+        case '5':
+        	mode = PHONG;
+            std::cout<<"Mode Not Implemented Applying Phong"<<std::endl;
+        	break;
+        case '6':
+        	mode = PHONG;
+            std::cout<<"Mode Not Implemented Applying Phong"<<std::endl;
+        	break;
+        default:
+            std::cout<<"Mode Not Implemented. Please give another input"<<std::endl;
+        	break;
+    }
+
+    Setup(mode);
 
     // run the ray tracer
     pRayTracer->Run(pScene, "output.png", mode);

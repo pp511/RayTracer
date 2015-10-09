@@ -70,11 +70,11 @@ bool Sphere::FindIntersection(Ray ray, Intersection *pIntersection)
 		float D = sqrtf(discriminant);
 		float t1 = (-0.5f)*(b+D)/a;
 		float t2 = (-0.5f)*(b-D)/a;
-		/* Chosing the closest intersection point*/
 
 		if (D < 0.0f)
 		return false;
 
+		/* Chosing the closest intersection point*/
 		if (t1 > 0.000001f)
 		{
 			t = (float)t1;
@@ -89,11 +89,8 @@ bool Sphere::FindIntersection(Ray ray, Intersection *pIntersection)
 		// 2. Store the results of the intersection
 		STVector3 raydistance = ray.Origin() - pIntersection->point ;
 		pIntersection->distanceSqu = STVector3::Dot(raydistance, raydistance);
-
 		pIntersection->point = ray.Origin() + t*ray.Direction();
-
 	//	std::cout << "\n Sphere Intersection " <<pIntersection->point.x <<pIntersection->point.y<<pIntersection->point.z << std::endl;
-
 		pIntersection->normal = (pIntersection->point - m_center) / r;
 		pIntersection->surface = this;
 		pIntersection->intersection_color = this->getmatColor();
@@ -101,30 +98,35 @@ bool Sphere::FindIntersection(Ray ray, Intersection *pIntersection)
 }
 	// 3. if found and return true, otherwise, return false
     return(bFound);
-    // NOTE: The IntersectionPoint pIntersection should store:
 
-    // hit point, surface normal, the time t of the ray at the hit point
-    // and the surface being hit
-    //------------------------------------------------
-   //------------------------------------------------------
 }
 
-
+//-------------------------------------------------
+// Change the dimention os sphere
+//-------------------------------------------------
 void Sphere::resizeSphere(float resize)
 {
 	m_radius = m_radius*resize;
 }
+//-------------------------------------------------
+// Translate the sphere to a new postion
+//-------------------------------------------------
 void Sphere::moveSphere(STVector3 pos)
 {
 	m_center +=STVector3(pos);
 }
-
+//-------------------------------------------------
+// Apply material color to the sphere
+//-------------------------------------------------
 
 void Sphere::applymatColor(RGBR_f matcolor)
 {
 	m_color = matcolor;
 }
 
+//-------------------------------------------------
+// Retreives the material color of sphere
+//-------------------------------------------------
 RGBR_f Sphere::getmatColor(void)
 {
 	return m_color;

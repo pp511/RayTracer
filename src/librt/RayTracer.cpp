@@ -47,20 +47,19 @@ void RayTracer::Run(Scene *pScene, std::string fName, RenderMode mode)
     // set the shader's render mode
     pShader->SetMode(mode);
 
-
-    //int width = 320;
+   // int width = 320;
    // int height = 400;
     int width = 900;
     int height = 600;
     RGBR_f bkground = pScene->GetBackgroundColor();
     STImage *pImg = new STImage(width, height, STImage::Pixel(bkground.r*255, bkground.g*255, bkground.b*255, bkground.a*255));
 
-    // TO DO: Proj2 raytracer
-    // CAP5705 - Implement the ray tracing algorithm.
     // 1. Cast a ray from the camera into the scene.
     int i,j,k;
 
     Shader* myshader = new Shader();
+    myshader->SetMode(mode);
+
 	Intersection *pIntersection = new Intersection;
 	Ray* myray = new Ray();
 	int numlightsources= pScene->GetNumLightSources();
@@ -75,46 +74,30 @@ void RayTracer::Run(Scene *pScene, std::string fName, RenderMode mode)
     		 if(pScene->FindClosestIntersection(*myray,pIntersection))
     		 {
     			 //Calculate Shading
-#if 1
+
     			 for(int k = 0 ; k < numlightsources ; k++ )
     			 	{
     				 for(float x = i; x < i + 1.0f; x += 0.5f)
     			     for(float y = j; y < j + 1.0f; y += 0.5f)
     			     {
-    			   // 	 std::cout<<x<<" "<<y<<std::endl;
 						STVector3 lr = pScene->GetLightDirection(k,pIntersection);
 						STVector3 lp = pScene->GetLightPosition(k,pIntersection);
 						RGBR_f intcolor = myshader->Run(k,pIntersection,&lr,pScene, lp,*myray);
-				//		std::cout<<intcolor.r<<" "<<intcolor.g<<" "<<intcolor.b<<std::endl;
 
 						//if(MinimumColor(intcolor))
 						pImg->SetPixel(y,x,STColor4ub(intcolor.r*255,intcolor.g*255,\
 						    			    	intcolor.b*255,bkground.a*255));
     			     }
     			    }
-#else
-    			 /*	STVector3 lr = pScene->GetLightDirection(0,pIntersection);
-					STVector3 lp = pScene->GetLightPosition(0,pIntersection);
-					RGBR_f intcolor = myshader->Run(0,pIntersection,&lr,pScene, lp);
-					pImg->SetPixel(j,i,STColor4ub(intcolor.r*255,intcolor.g*255,\
-											intcolor.b*255,bkground.a*255));
-*/
-    		//	 pImg->SetPixel(j,i,STColor4ub(255,255,0,255));
-#endif
+
     		 }
     		 else
     			 pImg->SetPixel(j,i,STColor4ub(bkground.r*255, bkground.g*255, bkground.b*255, bkground.a*255));
 
 
     	}
-    //       - no interection means shade to the background color
-    //       - one intersection - great compute shading
-    //       - otherwise implement any special handling resolve
-    //         ambiguities (determine the best choice or throw an exception)
 
-
-
-    // 4. Save the output image
+   // 4. Save the output image
     // NOTE: STImage stores colors in pixels in the range 0-255
     // If you compute color channels in a range 0-1 you must convert
     //------------------------------------------------

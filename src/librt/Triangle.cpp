@@ -41,7 +41,7 @@ bool Triangle::IntersectionSolver(Ray ray, STVector3 A, STVector3 B, STVector3 C
 {
     LinearSolver L;
     bool bFoundSolution = false;
-    
+    // Didn't Use this function. Did the computations locally.
     // TO DO: Proj2 raytracer
     // CAP5705 - Solve for intersections.
     // 1. Use barycentric coordinates and linear equations to solve for intersections
@@ -104,8 +104,6 @@ bool Triangle::FindIntersection (Ray ray, Intersection *pIntersection)
         {
         	 return(false);
         }
-
-
         float f =1 / a;
 
         STVector3 Rorg = ray.Origin();
@@ -128,8 +126,6 @@ bool Triangle::FindIntersection (Ray ray, Intersection *pIntersection)
             float intx = ray.Origin().x+t*(raydir.x);
             float inty = ray.Origin().y+t*(raydir.y);
             float intz = ray.Origin().z+t*(raydir.z);
-       //     std::cout<< " Triangle Intersection "<<intx<<" "<< inty<<" "<<intz<<std::endl;
-
             pIntersection->point = STVector3(intx,inty,intz);
             pIntersection->surface = this;
             pIntersection->normal =ComputeNormalVector();
@@ -158,17 +154,21 @@ STVector3 Triangle::ComputeNormalVector(void)
     //---------------------------------------------------
     STVector3 edge1 = this->m_c - this->m_a;
     STVector3 edge2 = this->m_b - this->m_a;
-   // STVector3 crossp = crossproduct(edge1, edge2);
     STVector3 crossp =STVector3::Cross(edge2, edge1);
-   // STVector3 nl=crossp/(STVector3::Dot(crossp,crossp)) ;
     return(crossp);
 }
-
+//-------------------------------------------------
+// Applies material color
+//-------------------------------------------------
 
 void Triangle::applymatColor(RGBR_f matcolor)
 {
 	m_color = matcolor;
 }
+//-------------------------------------------------
+// Retrieves material color
+//-------------------------------------------------
+
 
 RGBR_f Triangle::getmatColor(void)
 {

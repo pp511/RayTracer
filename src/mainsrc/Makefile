@@ -111,7 +111,9 @@ $(RTLIB_DIR)/rtlib.a:
 $(TARGET): $(OBJS) $(LIBST_DIR)/libst.a  $(RTLIB_DIR)/rtlib.a
 	$(LD) -o $(TARGET) $(OBJS) $(LDFLAGS) $(LDLIBS) $(LDFRAMEWORKS)
 
-
+run:
+	./prog2_raytracer $(mode)
+	
 %.o : %.cpp
 	$(CC) $(CFLAGS) -o $@ -c $<
 
