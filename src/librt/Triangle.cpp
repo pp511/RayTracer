@@ -135,6 +135,7 @@ bool Triangle::FindIntersection (Ray ray, Intersection *pIntersection)
             pIntersection->normal =ComputeNormalVector();
             STVector3 raydistance = ray.Origin() - pIntersection->point ;
             pIntersection->distanceSqu = STVector3::Dot(raydistance,raydistance);
+            pIntersection->intersection_color = this->getmatColor();
 
             bFound = true;
         }
@@ -162,6 +163,18 @@ STVector3 Triangle::ComputeNormalVector(void)
    // STVector3 nl=crossp/(STVector3::Dot(crossp,crossp)) ;
     return(crossp);
 }
+
+
+void Triangle::applymatColor(RGBR_f matcolor)
+{
+	m_color = matcolor;
+}
+
+RGBR_f Triangle::getmatColor(void)
+{
+	return m_color;
+}
+
 
 
 // TO DO: Proj2 raytracer

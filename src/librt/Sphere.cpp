@@ -96,6 +96,7 @@ bool Sphere::FindIntersection(Ray ray, Intersection *pIntersection)
 
 		pIntersection->normal = (pIntersection->point - m_center) / r;
 		pIntersection->surface = this;
+		pIntersection->intersection_color = this->getmatColor();
 		bFound = true;
 }
 	// 3. if found and return true, otherwise, return false
@@ -117,3 +118,15 @@ void Sphere::moveSphere(STVector3 pos)
 {
 	m_center +=STVector3(pos);
 }
+
+
+void Sphere::applymatColor(RGBR_f matcolor)
+{
+	m_color = matcolor;
+}
+
+RGBR_f Sphere::getmatColor(void)
+{
+	return m_color;
+}
+

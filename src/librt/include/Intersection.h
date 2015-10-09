@@ -14,6 +14,7 @@
 
 
 #include "STVector3.h"
+#include "RGBR_f.h"
 
 
 class Surface;
@@ -30,8 +31,11 @@ public:
     STVector3       normal;
     Surface         *surface;
     float 			pIntersection    (STVector3 );
-
+    RGBR_f			intersection_color;
 	float dotproduct(STVector3 raydirection);
+
+	RGBR_f getMatColor(void);
+	void setMatColor(RGBR_f matcolor);
 
 };
 

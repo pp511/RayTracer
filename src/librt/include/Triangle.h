@@ -28,6 +28,9 @@ public:
 
 
     void generateVertices(STVector3 a,STVector3 b,STVector3 c);
+    void applymatColor(RGBR_f matcolor);
+    RGBR_f getmatColor(void);
+
 
 private:
 
@@ -36,6 +39,8 @@ private:
     STVector3                   m_a;
     STVector3                   m_b;
     STVector3                   m_c;
+    RGBR_f 						m_color;
+
 
 
     // linear systems
@@ -44,6 +49,7 @@ private:
     STVector3                   ComputeNormalVector             (void);
     STVector3                   crossproduct         (STVector3 u ,STVector3 v);
     float                       dotproduct          (STVector3 v,STVector3 u);
+
 
     // TO DO: Proj2 raytracer
     // CAP5705 - Add object specific properties.

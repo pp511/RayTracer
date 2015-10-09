@@ -26,9 +26,14 @@ public:
 
     void resizeSphere(float resize);
     void moveSphere(STVector3 pos);
+    void applymatColor(RGBR_f matcolor);
+    RGBR_f getmatColor(void);
+
+
 private:
 
     float                       m_radius;
+    RGBR_f 						m_color;
 
 
     // TO DO: Proj2 raytracer

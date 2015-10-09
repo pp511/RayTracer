@@ -76,16 +76,22 @@ void RayTracer::Run(Scene *pScene, std::string fName, RenderMode mode)
     		 {
     			 //Calculate Shading
 #if 1
-
     			 for(int k = 0 ; k < numlightsources ; k++ )
     			 	{
+    				 for(float x = i; x < i + 1.0f; x += 0.5f)
+    			     for(float y = j; y < j + 1.0f; y += 0.5f)
+    			     {
+    			   // 	 std::cout<<x<<" "<<y<<std::endl;
 						STVector3 lr = pScene->GetLightDirection(k,pIntersection);
 						STVector3 lp = pScene->GetLightPosition(k,pIntersection);
 						RGBR_f intcolor = myshader->Run(k,pIntersection,&lr,pScene, lp,*myray);
 				//		std::cout<<intcolor.r<<" "<<intcolor.g<<" "<<intcolor.b<<std::endl;
-						pImg->SetPixel(j,i,STColor4ub(intcolor.r*255,intcolor.g*255,\
+
+						//if(MinimumColor(intcolor))
+						pImg->SetPixel(y,x,STColor4ub(intcolor.r*255,intcolor.g*255,\
 						    			    	intcolor.b*255,bkground.a*255));
-    			 	}
+    			     }
+    			    }
 #else
     			 /*	STVector3 lr = pScene->GetLightDirection(0,pIntersection);
 					STVector3 lp = pScene->GetLightPosition(0,pIntersection);
