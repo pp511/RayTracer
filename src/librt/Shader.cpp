@@ -29,7 +29,7 @@ void Shader::SetMode(RenderMode mode)
 RGBR_f Shader::Run(int i, Intersection *pIntersection, STVector3 *lightDirection,Scene *pScene, STVector3 lp,Ray ray)
 {
     RGBR_f color;
-    m_mode = PHONG;
+  //	 m_mode = PHONG;
 
     RGBR_f matcolor = pIntersection->getMatColor();
 
@@ -39,6 +39,7 @@ RGBR_f Shader::Run(int i, Intersection *pIntersection, STVector3 *lightDirection
             break;
         case PHONG:
             color = Phong(i,pIntersection, lightDirection,pScene,lp,ray);
+       //     color = RGBR_f(color.r * matcolor.r, color.g * matcolor.g, color.b * matcolor.b, color.a * matcolor.a);
             break;
         default:
             color = Lambertian(i, pIntersection, lightDirection,pScene,lp);
@@ -52,7 +53,9 @@ RGBR_f Shader::Run(int i, Intersection *pIntersection, STVector3 *lightDirection
     //---------------------------------------------------------
     //---------------------------------------------------------
  //   color = RGBR_f(color.r *255, color.g, color.b,color.a);
-    color = RGBR_f(color.r * matcolor.r, color.g * matcolor.g, color.b * matcolor.b, color.a * matcolor.a);
+   color = RGBR_f(color.r * matcolor.r, color.g * matcolor.g, color.b * matcolor.b, color.a * matcolor.a);
+  //  std::cout<< " <<r g b f material"<<matcolor.r<<" "<<matcolor.g<<" "<<matcolor.b<<std::endl;
+
     return(color);
 }
 
@@ -64,31 +67,39 @@ RGBR_f Shader::Lambertian(int i, Intersection *pIntersection, STVector3 *lightDi
     assert(lightDirection);
     RGBR_f Imax = RGBR_f(1, 1, 1, 1);
     RGBR_f color, diffused;
-    float Kd =0.8;
+    float Kd =0.9;
     // TO DO: Proj2 raytracer
     // CAP5705 - Add shading lambertian shading.
     // 1. Lambertian shading is the dot product of the the
    //    normal and light direction
 #if 1
     STVector3 normal= pIntersection->normal/pIntersection->distanceSqu;
-    float dotp= STVector3::Dot(normal,*lightDirection);
+ //   STVector3 normal= pIntersection->normal;
+       float dotp= STVector3::Dot(normal,*lightDirection);
+ //   float dotp= STVector3::Dot(normal,*lightDirection/STVector3::Dot(*lightDirection,*lightDirection));
 #else
-   float dotp= STVector3::Dot(pIntersection->normal,*lightDirection);
-  //float dotp= STVector3::Dot(pIntersection->normal/STVector3::Dot(pIntersection->normal,pIntersection->normal),*lightDirection);
+  // float dotp= STVector3::Dot(pIntersection->normal,*lightDirection);
+  float dotp= STVector3::Dot(pIntersection->normal/STVector3::Dot(pIntersection->normal,pIntersection->normal),*lightDirection);
 
 #endif
   //  std::cout<<"Dotproduce"<<dotp<<std::endl;
     if(dotp < 0) // max(0,n.l)
     {
+    	 //std::cout<<"Dotproduct"<<dotp<<std::endl;
     	 	dotp = 0;
     }
-    color = pScene->GetLightColor(i);
-    RGBR_f matcolor = pIntersection->getMatColor();
-
+    else{
+    	std::cout<<"Dotproduct"<<dotp<<std::endl;
+    }
+     color = pScene->GetLightColor(i);
+  /*
      diffused.r = Imax.r * color.r * dotp * Kd ;
      diffused.g = Imax.g * color.g * dotp * Kd ;
      diffused.b = Imax.b * color.b * dotp * Kd ;
-
+*/
+     	diffused.r = Imax.r * dotp *  Kd ;
+        diffused.g = Imax.g *  dotp * Kd ;
+        diffused.b = Imax.b *  dotp * Kd ;
     // 2. Do not forget the multiply your albedo by the result
     //---------------------------------------------------------
 
@@ -118,7 +129,8 @@ RGBR_f Shader::Phong(int i, Intersection *pIntersection, STVector3 *lightDirecti
     RGBR_f diffused = Lambertian(i,pIntersection, lightDirection,pScene,lp);
 
     RGBR_f Ks = RGBR_f(0.5,0.5,0.5,0.5);
-    STVector3 eye = STVector3(200.0,200.0,200.0) ;
+   // STVector3 eye = STVector3(200.0,200.0,200.0) ;
+    STVector3 eye = STVector3(0,0,0) ;
     STVector3 eyeray = eye - pIntersection->point;
    // STVector3 eyeray = ray.origin - pIntersection->point;
     STVector3 l = *lightDirection/(sqrtf(STVector3::Dot(*lightDirection,*lightDirection)));
@@ -127,7 +139,7 @@ RGBR_f Shader::Phong(int i, Intersection *pIntersection, STVector3 *lightDirecti
     STVector3 normal= pIntersection->normal/pIntersection->distanceSqu;
   //  STVector3 normal= pIntersection->normal/(STVector3::Dot(pIntersection->normal,pIntersection->normal));
 
-    int exp = 5;
+    int exp = 2;
     float multiplier;
     float cosalpha = STVector3::Dot(normal,h);
     if(cosalpha < 0) // max(0,n.l)

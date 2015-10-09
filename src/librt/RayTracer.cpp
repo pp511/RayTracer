@@ -48,10 +48,10 @@ void RayTracer::Run(Scene *pScene, std::string fName, RenderMode mode)
     pShader->SetMode(mode);
 
 
-    int width = 320;
-    int height = 400;
-    //int width = 1800;
-    //int height = 1000;
+    //int width = 320;
+   // int height = 400;
+    int width = 900;
+    int height = 600;
     RGBR_f bkground = pScene->GetBackgroundColor();
     STImage *pImg = new STImage(width, height, STImage::Pixel(bkground.r*255, bkground.g*255, bkground.b*255, bkground.a*255));
 
